@@ -1,5 +1,6 @@
 package com.paradoxie.autoverticaltextview;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         titleList.add("你踏着七彩祥云离去");
         titleList.add("我被留在这里");
         TextView.setTextList(titleList);
-//        TextView.setText(26, 5, Color.RED);//设置属性
+        TextView.setText(26, 5, Color.RED);//设置属性
         TextView.setTextStillTime(3000);//设置停留时长间隔
         TextView.setAnimTime(300);//设置进入和退出的时间间隔
         TextView.setOnItemClickListener(new VerticalTextview.OnItemClickListener() {
