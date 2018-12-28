@@ -29,16 +29,21 @@ public class VerticalTextview extends TextSwitcher implements ViewSwitcher.ViewF
     private static final int FLAG_START_AUTO_SCROLL = 0;
     private static final int FLAG_STOP_AUTO_SCROLL = 1;
 
-    private float mTextSize = 16 ;
+    private static final int STATE_PAUSE = 2;
+    private static final int STATE_SCROLL = 3;
+
+    private float mTextSize = 16;
     private int mPadding = 5;
     private int textColor = Color.BLACK;
 
+    private int mScrollState = STATE_PAUSE;
+
     /**
-     * @param textSize 字号
-     * @param padding 内边距
-     * @param textColor 字体颜色
+     * @param textSize  textsize
+     * @param padding   padding
+     * @param textColor textcolor
      */
-    public void setText(float textSize,int padding,int textColor) {
+    public void setText(float textSize, int padding, int textColor) {
         mTextSize = textSize;
         mPadding = padding;
         this.textColor = textColor;
@@ -74,11 +79,12 @@ public class VerticalTextview extends TextSwitcher implements ViewSwitcher.ViewF
     }
 
     /**
-     * 间隔时间
+     * set time.
+     *
      * @param time
      */
-    public void setTextStillTime(final long time){
-       handler =new Handler() {
+    public void setTextStillTime(final long time) {
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
@@ -87,7 +93,7 @@ public class VerticalTextview extends TextSwitcher implements ViewSwitcher.ViewF
                             currentId++;
                             setText(textList.get(currentId % textList.size()));
                         }
-                        handler.sendEmptyMessageDelayed(FLAG_START_AUTO_SCROLL,time);
+                        handler.sendEmptyMessageDelayed(FLAG_START_AUTO_SCROLL, time);
                         break;
                     case FLAG_STOP_AUTO_SCROLL:
                         handler.removeMessages(FLAG_START_AUTO_SCROLL);
@@ -96,8 +102,10 @@ public class VerticalTextview extends TextSwitcher implements ViewSwitcher.ViewF
             }
         };
     }
+
     /**
-     * 设置数据源
+     * set Data list.
+     *
      * @param titles
      */
     public void setTextList(ArrayList<String> titles) {
@@ -107,16 +115,18 @@ public class VerticalTextview extends TextSwitcher implements ViewSwitcher.ViewF
     }
 
     /**
-     * 开始滚动
+     * start auto scroll
      */
     public void startAutoScroll() {
+        mScrollState = STATE_SCROLL;
         handler.sendEmptyMessage(FLAG_START_AUTO_SCROLL);
     }
 
     /**
-     * 停止滚动
+     * stop auto scroll
      */
     public void stopAutoScroll() {
+        mScrollState = STATE_PAUSE;
         handler.sendEmptyMessage(FLAG_STOP_AUTO_SCROLL);
     }
 
@@ -142,22 +152,40 @@ public class VerticalTextview extends TextSwitcher implements ViewSwitcher.ViewF
     }
 
     /**
-     * 设置点击事件监听
-     * @param itemClickListener
+     * set onclick listener
+     *
+     * @param itemClickListener listener
      */
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 
     /**
-     * 轮播文本点击监听器
+     * item click listener
      */
     public interface OnItemClickListener {
         /**
-         * 点击回调
-         * @param position 当前点击ID
+         * callback
+         *
+         * @param position position
          */
         void onItemClick(int position);
     }
 
+    public boolean isScroll(){
+        return mScrollState ==STATE_SCROLL;
+    }
+
+    public boolean isPause(){
+        return mScrollState == STATE_PAUSE;
+    }
+
+    //memory leancks.
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if(handler!=null){
+            handler.removeCallbacksAndMessages(null);
+        }
+    }
 }
